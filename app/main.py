@@ -205,7 +205,13 @@ async def add_feed(
             {"request": request, "feed": feed, "current_user": current_user}
         )
     except ValueError as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        # For HTMX requests, return the form with error message
+        error_message = str(e)
+        return templates.TemplateResponse(
+            "feed_form_error.html",
+            {"request": request, "error": error_message, "url": url, "category": category},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
 
 @app.get("/feeds/{feed_id}/entries", response_class=HTMLResponse)
 async def get_feed_entries(

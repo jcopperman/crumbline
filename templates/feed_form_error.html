@@ -1,0 +1,18 @@
+<div id="feed-form-container">
+    <form hx-post="/feeds" 
+          hx-target="#feed-form-container"
+          hx-swap="outerHTML"
+          class="mb-8">
+        <div id="feed-error-message" class="mb-4 p-3 bg-red-900/30 border border-red-800 text-red-200 rounded">
+            {{ error }}
+        </div>
+        <input type="url" name="url" placeholder="Feed URL" required value="{{ url }}"
+            class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-3 text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange">
+        <input type="text" name="category" placeholder="Category (optional)" value="{{ category }}"
+            class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-3 text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange">
+        <button type="submit" 
+            class="w-full p-3 bg-crumb-accent-orange/80 text-crumb-text rounded hover:bg-crumb-accent-orange transition-colors">
+            Add Feed
+        </button>
+    </form>
+</div>

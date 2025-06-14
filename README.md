@@ -227,7 +227,3 @@ The application uses:
 ## License
 
 MIT
-
----
-
-If you want I can also add a small `crontab` or `systemd` guide later. Let me know when you're ready to open-source it or link it up to the domain.
