@@ -60,12 +60,134 @@ python main.py
 
 4. Log in with the credentials you created
 
-2. Open your browser and navigate to:
-```
-http://localhost:8000
+## Server Deployment
+
+To deploy Crumbline on a production server with Nginx:
+
+1. Clone the repository to your server:
+```bash
+git clone <repository-url> /var/www/crumbline
+cd /var/www/crumbline
 ```
 
-3. Add your first RSS feed by entering its URL in the sidebar form.
+2. Run the automated setup script (requires root privileges):
+```bash
+sudo ./setup_server.sh
+```
+
+3. The script will:
+   - Install necessary system packages
+   - Create a Python virtual environment
+   - Install Python dependencies
+   - Create an admin user
+   - Configure a systemd service for automatic startup
+   - Configure Nginx as a reverse proxy
+   - Set proper file permissions
+
+4. Access your Crumbline instance at your domain.
+
+### Manual Setup
+
+If you prefer to set up manually:
+
+1. Install Nginx and create a virtual environment
+```bash
+sudo apt update
+sudo apt install -y python3 python3-venv python3-pip nginx
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt
+```
+
+2. Copy the systemd service file and enable it:
+```bash
+sudo cp crumbline.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable crumbline.service
+sudo systemctl start crumbline.service
+```
+
+3. Configure Nginx:
+```bash
+sudo cp nginx_crumbline.conf /etc/nginx/sites-available/crumbline
+sudo ln -sf /etc/nginx/sites-available/crumbline /etc/nginx/sites-enabled/
+sudo nginx -t
+sudo systemctl restart nginx
+```
+
+### Alternative: Using Supervisor (instead of systemd)
+
+If you prefer using Supervisor instead of systemd:
+
+1. Install Supervisor:
+```bash
+sudo apt install -y supervisor
+```
+
+2. Copy the supervisor configuration file:
+```bash
+sudo cp supervisor_crumbline.conf /etc/supervisor/conf.d/crumbline.conf
+sudo supervisorctl reread
+sudo supervisorctl update
+sudo supervisorctl start crumbline
+```
+
+3. Check the status with:
+```bash
+sudo supervisorctl status crumbline
+```
+
+### Docker Deployment
+
+For a containerized deployment using Docker:
+
+1. Make sure Docker and Docker Compose are installed:
+```bash
+sudo apt update
+sudo apt install -y docker.io docker-compose
+```
+
+2. Build and start the containers:
+```bash
+cd /var/www/crumbline
+docker-compose up -d
+```
+
+3. Access Crumbline at http://your-server-ip:80
+
+4. For security in production, edit the `docker-compose.yml` file to change:
+   - The default admin password
+   - The SECRET_KEY environment variable
+
+5. To update the application:
+```bash
+git pull
+docker-compose up -d --build
+```
+
+### Setting up SSL with Let's Encrypt
+
+To secure your Crumbline instance with HTTPS:
+
+1. Make sure you have a domain pointing to your server
+2. Run the SSL setup script:
+
+```bash
+sudo ./setup_ssl.sh
+```
+
+3. The script will:
+   - Install Certbot
+   - Obtain SSL certificates for your domain
+   - Configure Nginx to use HTTPS
+   - Enable automatic certificate renewal
+
+Alternatively, you can manually set up SSL:
+
+```bash
+sudo apt install -y certbot python3-certbot-nginx
+sudo certbot --nginx -d yourdomain.com
+```
 
 ## Project Structure
 

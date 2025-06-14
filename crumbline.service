@@ -1,0 +1,16 @@
+[Unit]
+Description=Crumbline RSS Reader
+After=network.target
+
+[Service]
+User=www-data
+Group=www-data
+WorkingDirectory=/var/www/crumbline
+Environment="PATH=/var/www/crumbline/venv/bin"
+ExecStart=/var/www/crumbline/venv/bin/python /var/www/crumbline/main.py
+Restart=always
+RestartSec=5
+SyslogIdentifier=crumbline
+
+[Install]
+WantedBy=multi-user.target
