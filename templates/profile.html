@@ -5,14 +5,17 @@
     <!-- Sidebar (same as index) -->
     <div class="w-72 bg-crumb-bg border-r border-crumb-accent-dark/20 sticky top-0 h-screen overflow-y-auto">
         <div class="p-8">
-            <h1 class="font-serif text-2xl mb-8 text-crumb-text">Crumbline</h1>
+            <div class="flex items-center mb-8 group cursor-pointer">
+                <img src="/static/images/logo.svg" alt="Crumbline Logo" class="h-10 w-auto mr-3 group-hover:rotate-12 transition-transform duration-300">
+                <h1 class="font-serif text-2xl text-crumb-text group-hover:text-crumb-accent-orange transition-colors">Crumbline</h1>
+            </div>
             
             <!-- Navigation -->
             <div class="mb-8">
-                <a href="/" class="block p-3 mb-2 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text hover:bg-crumb-accent-dark/20 transition-colors">
+                <a href="/" class="block p-3 mb-2 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text hover:bg-crumb-accent-orange/50 transition-colors">
                     Home
                 </a>
-                <a href="/profile" class="block p-3 bg-crumb-accent-dark/20 border border-crumb-accent-dark/20 rounded text-crumb-text hover:bg-crumb-accent-dark/30 transition-colors">
+                <a href="/profile" class="block p-3 bg-crumb-accent-orange/80 border border-crumb-accent-orange/20 rounded text-crumb-text hover:bg-crumb-accent-orange transition-colors">
                     Profile
                 </a>
             </div>
@@ -24,24 +27,24 @@
         <div class="max-w-content mx-auto p-8">
             <h2 class="font-serif text-3xl mb-6">User Profile</h2>
             
-            <div class="bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded p-6 mb-8">
+            <div class="bg-crumb-accent-dark/10 border border-crumb-accent-orange/20 rounded p-6 mb-8">
                 <div class="mb-4">
-                    <h3 class="text-crumb-muted mb-1">Username</h3>
+                    <h3 class="text-crumb-accent-orange mb-1">Username</h3>
                     <p class="text-xl">{{ current_user.username }}</p>
                 </div>
                 
                 <div class="mb-4">
-                    <h3 class="text-crumb-muted mb-1">Email</h3>
+                    <h3 class="text-crumb-accent-orange mb-1">Email</h3>
                     <p class="text-xl">{{ current_user.email }}</p>
                 </div>
                 
                 <div>
-                    <h3 class="text-crumb-muted mb-1">Member Since</h3>
+                    <h3 class="text-crumb-accent-orange mb-1">Member Since</h3>
                     <p class="text-xl">{{ current_user.created_at.strftime('%B %d, %Y') }}</p>
                 </div>
             </div>
             
-            <a href="/logout" class="inline-block px-6 py-3 bg-crumb-accent-dark/20 text-crumb-text rounded hover:bg-crumb-accent-dark/30 transition-colors">
+            <a href="/logout" class="inline-block px-6 py-3 bg-crumb-accent-orange/80 text-crumb-text rounded hover:bg-crumb-accent-orange transition-colors">
                 Logout
             </a>
         </div>

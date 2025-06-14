@@ -3,7 +3,10 @@
 {% block content %}
 <div class="flex justify-center items-center min-h-screen">
     <div class="w-full max-w-md p-8 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded">
-        <h1 class="font-serif text-2xl mb-6 text-center text-crumb-text">Create an Account</h1>
+        <div class="flex flex-col items-center mb-6">
+            <img src="/static/images/logo.svg" alt="Crumbline Logo" class="h-16 w-auto mb-4 hover:rotate-12 transition-transform duration-300">
+            <h1 class="font-serif text-2xl text-center text-crumb-accent-orange">Create an Account</h1>
+        </div>
         
         {% if error %}
         <div id="error-message" class="mb-4 p-3 bg-red-900/30 border border-red-800 text-red-200 rounded">
@@ -24,7 +27,7 @@
                     id="username" 
                     name="username" 
                     required
-                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-medium"
+                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange focus:ring-1 focus:ring-crumb-accent-orange/50"
                 >
             </div>
             <div>
@@ -34,7 +37,7 @@
                     id="email" 
                     name="email" 
                     required
-                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-medium"
+                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange focus:ring-1 focus:ring-crumb-accent-orange/50"
                 >
             </div>
             <div>
@@ -44,7 +47,7 @@
                     id="password" 
                     name="password" 
                     required
-                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-medium"
+                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange focus:ring-1 focus:ring-crumb-accent-orange/50"
                 >
             </div>
             <div>
@@ -54,12 +57,12 @@
                     id="confirm_password" 
                     name="confirm_password" 
                     required
-                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-medium"
+                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange focus:ring-1 focus:ring-crumb-accent-orange/50"
                 >
             </div>
             <button 
                 type="submit" 
-                class="w-full p-3 bg-crumb-accent-dark/20 text-crumb-text rounded hover:bg-crumb-accent-dark/30 transition-colors"
+                class="w-full p-3 bg-crumb-accent-orange/80 text-crumb-text rounded hover:bg-crumb-accent-orange transition-colors"
             >
                 Register
             </button>
@@ -68,7 +71,7 @@
         <div class="mt-6 text-center">
             <p class="text-crumb-muted">
                 Already have an account? 
-                <a href="/login" class="text-crumb-accent-medium hover:underline">Login</a>
+                <a href="/login" class="text-crumb-accent-orange hover:underline">Login</a>
             </p>
         </div>
     </div>

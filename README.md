@@ -2,6 +2,8 @@
 
 A simple, self-hosted RSS feed reader built with FastAPI, HTMX, and Tailwind CSS.
 
+![Crumbline Logo](static/images/logo.svg)
+
 ## Why Crumbline?
 
 I built this out of pure frustration.  

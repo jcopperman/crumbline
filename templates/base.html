@@ -4,6 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Crumbline</title>
+    <!-- Favicons -->
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/images/favicon/apple-touch-icon.png">
+    <link rel="icon" type="image/png" sizes="32x32" href="/static/images/favicon/favicon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/static/images/favicon/favicon-16x16.png">
+    <link rel="icon" href="/static/images/logo.svg" type="image/svg+xml">
+    <link rel="manifest" href="/static/images/site.webmanifest">
+    <meta name="theme-color" content="#FF9052">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -21,7 +28,8 @@
                             'accent': {
                                 'light': '#e0c8b0',
                                 'medium': '#c37b7b',
-                                'dark': '#555555'
+                                'dark': '#555555',
+                                'orange': '#FF9052'
                             }
                         }
                     },
@@ -43,9 +51,14 @@
 <body class="bg-crumb-bg text-crumb-text font-sans leading-relaxed">
     <div class="min-h-screen">
         {% if current_user %}
-        <div class="bg-crumb-accent-dark/20 border-b border-crumb-accent-dark/30 py-2 px-4 flex justify-end items-center">
-            <span class="mr-4">Hello, {{ current_user.username }}</span>
-            <a href="/logout" class="text-crumb-accent-medium hover:underline">Logout</a>
+        <div class="bg-crumb-accent-dark/20 border-b border-crumb-accent-dark/30 py-2 px-4 flex justify-between items-center">
+            <div class="flex items-center">
+                <img src="/static/images/logo.svg" alt="Crumbline Logo" class="h-8 w-auto mr-2">
+            </div>
+            <div>
+                <span class="mr-4">Hello, {{ current_user.username }}</span>
+                <a href="/logout" class="text-crumb-accent-orange hover:underline">Logout</a>
+            </div>
         </div>
         {% endif %}
         {% block content %}{% endblock %}

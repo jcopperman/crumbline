@@ -11,7 +11,8 @@ module.exports = {
           'accent': {
             'light': '#e0c8b0',
             'medium': '#c37b7b',
-            'dark': '#555555'
+            'dark': '#555555',
+            'orange': '#FF9052' // Color from the logo
           }
         }
       },
