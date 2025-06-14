@@ -15,6 +15,8 @@ Now I control it, I host it, and it'll never disappear unless I decide it does.
 - Group feeds into categories
 - Automatic feed updates every 30 minutes
 - Mark entries as read/unread
+- User authentication with secure login
+- Session management with JWT tokens
 - Clean, responsive UI with Tailwind CSS
 - Dynamic updates with HTMX
 
@@ -44,10 +46,19 @@ pip install -r requirements.txt
 
 ## Usage
 
-1. Start the server:
+1. Create an admin user:
+```bash
+python create_admin.py admin admin@example.com yourpassword
+```
+
+2. Start the server:
 ```bash
 python main.py
 ```
+
+3. Open your browser and navigate to http://localhost:8000
+
+4. Log in with the credentials you created
 
 2. Open your browser and navigate to:
 ```

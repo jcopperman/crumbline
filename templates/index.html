@@ -7,6 +7,16 @@
         <div class="p-8">
             <h1 class="font-serif text-2xl mb-8 text-crumb-text">Crumbline</h1>
             
+            <!-- Navigation -->
+            <div class="mb-8">
+                <a href="/" class="block p-3 mb-2 bg-crumb-accent-dark/20 border border-crumb-accent-dark/20 rounded text-crumb-text hover:bg-crumb-accent-dark/30 transition-colors">
+                    Home
+                </a>
+                <a href="/profile" class="block p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text hover:bg-crumb-accent-dark/20 transition-colors">
+                    Profile
+                </a>
+            </div>
+            
             <!-- Add Feed Form -->
             <form hx-post="/feeds" 
                   hx-target="#feed-list"

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex justify-center items-center min-h-screen">
+    <div class="w-full max-w-md p-8 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded">
+        <h1 class="font-serif text-3xl mb-6 text-center text-crumb-text">Access Denied</h1>
+        
+        <p class="mb-6 text-center text-crumb-muted">
+            You need to be logged in to access this page.
+        </p>
+        
+        <div class="flex justify-center">
+            <a href="/login" 
+               class="px-6 py-3 bg-crumb-accent-dark/20 text-crumb-text rounded hover:bg-crumb-accent-dark/30 transition-colors">
+                Go to Login
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

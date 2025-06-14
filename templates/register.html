@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="flex justify-center items-center min-h-screen">
+    <div class="w-full max-w-md p-8 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded">
+        <h1 class="font-serif text-2xl mb-6 text-center text-crumb-text">Create an Account</h1>
+        
+        {% if error %}
+        <div id="error-message" class="mb-4 p-3 bg-red-900/30 border border-red-800 text-red-200 rounded">
+            {{ error }}
+        </div>
+        {% endif %}
+        
+        <form 
+            hx-post="/register" 
+            hx-target="#register-container"
+            hx-swap="outerHTML"
+            class="space-y-4"
+            id="register-container">
+            <div>
+                <label for="username" class="block mb-2 text-crumb-text">Username</label>
+                <input 
+                    type="text" 
+                    id="username" 
+                    name="username" 
+                    required
+                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-medium"
+                >
+            </div>
+            <div>
+                <label for="email" class="block mb-2 text-crumb-text">Email</label>
+                <input 
+                    type="email" 
+                    id="email" 
+                    name="email" 
+                    required
+                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-medium"
+                >
+            </div>
+            <div>
+                <label for="password" class="block mb-2 text-crumb-text">Password</label>
+                <input 
+                    type="password" 
+                    id="password" 
+                    name="password" 
+                    required
+                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-medium"
+                >
+            </div>
+            <div>
+                <label for="confirm_password" class="block mb-2 text-crumb-text">Confirm Password</label>
+                <input 
+                    type="password" 
+                    id="confirm_password" 
+                    name="confirm_password" 
+                    required
+                    class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-medium"
+                >
+            </div>
+            <button 
+                type="submit" 
+                class="w-full p-3 bg-crumb-accent-dark/20 text-crumb-text rounded hover:bg-crumb-accent-dark/30 transition-colors"
+            >
+                Register
+            </button>
+        </form>
+        
+        <div class="mt-6 text-center">
+            <p class="text-crumb-muted">
+                Already have an account? 
+                <a href="/login" class="text-crumb-accent-medium hover:underline">Login</a>
+            </p>
+        </div>
+    </div>
+</div>
+{% endblock %}

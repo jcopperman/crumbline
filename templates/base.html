@@ -42,7 +42,13 @@
 </head>
 <body class="bg-crumb-bg text-crumb-text font-sans leading-relaxed">
     <div class="min-h-screen">
+        {% if current_user %}
+        <div class="bg-crumb-accent-dark/20 border-b border-crumb-accent-dark/30 py-2 px-4 flex justify-end items-center">
+            <span class="mr-4">Hello, {{ current_user.username }}</span>
+            <a href="/logout" class="text-crumb-accent-medium hover:underline">Logout</a>
+        </div>
+        {% endif %}
         {% block content %}{% endblock %}
     </div>
 </body>
-</html> 
+</html>
