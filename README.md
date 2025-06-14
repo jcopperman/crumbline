@@ -35,7 +35,7 @@ cd crumbline
 
 2. Create a virtual environment and activate it:
 ```bash
-python -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
@@ -48,12 +48,14 @@ pip install -r requirements.txt
 
 1. Create an admin user:
 ```bash
-python create_admin.py admin admin@example.com yourpassword
+# Make sure to use the Python from the virtual environment
+./venv/bin/python create_admin.py admin admin@example.com yourpassword
 ```
 
 2. Start the server:
 ```bash
-python main.py
+# Use the Python from the virtual environment
+./venv/bin/python main.py
 ```
 
 3. Open your browser and navigate to http://localhost:8000
@@ -99,7 +101,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. Copy the systemd service file and enable it:
+2. Copy the systemd service file and enable it (make sure the paths in the service file point to your virtual environment):
 ```bash
 sudo cp crumbline.service /etc/systemd/system/
 sudo systemctl daemon-reload
