@@ -1,0 +1,21 @@
+<article class="mb-12 {% if entry.is_read %}opacity-60{% endif %}" id="entry-{{ entry.id }}">
+    <header class="mb-4">
+        <h2 class="font-serif text-2xl mb-2">
+            <a href="{{ entry.link }}" target="_blank" 
+               class="text-crumb-text hover:text-crumb-accent-light transition-colors">
+                {{ entry.title }}
+            </a>
+        </h2>
+        <time class="text-crumb-muted text-sm">
+            {{ entry.published.strftime('%B %d, %Y') if entry.published else 'No date' }}
+        </time>
+    </header>
+    <div class="prose prose-invert max-w-none">
+        {{ entry.content|safe }}
+    </div>
+    <button hx-post="/entries/{{ entry.id }}/toggle"
+            hx-target="#entry-{{ entry.id }}"
+            class="mt-4 text-crumb-muted hover:text-crumb-accent-light transition-colors">
+        {% if entry.is_read %}✓ Read{% else %}○ Unread{% endif %}
+    </button>
+</article> 
