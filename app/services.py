@@ -6,9 +6,32 @@ from .models import Feed, Entry, Category
 
 async def add_feed(session: AsyncSession, url: str, category_name: str = None) -> Feed:
     # Parse feed to get initial data
-    parsed = feedparser.parse(url)
-    if parsed.bozo:
-        raise ValueError("Invalid RSS feed")
+    try:
+        parsed = feedparser.parse(url)
+        if parsed.bozo and hasattr(parsed, 'bozo_exception'):
+            raise ValueError(f"Invalid RSS feed: {parsed.bozo_exception}")
+        elif parsed.bozo:
+            raise ValueError("Invalid RSS feed format")
+        
+        # Check if feed has entries
+        if not hasattr(parsed, 'entries') or len(parsed.entries) == 0:
+            raise ValueError("Feed contains no entries")
+            
+        # Check if feed has a title
+        if not hasattr(parsed.feed, 'title'):
+            raise ValueError("Feed has no title")
+    except Exception as e:
+        if isinstance(e, ValueError):
+            raise
+        raise ValueError(f"Error fetching feed: {str(e)}")
+    
+    # Check if feed already exists
+    existing_feed = await session.execute(
+        select(Feed).where(Feed.url == url)
+    )
+    existing_feed = existing_feed.scalar_one_or_none()
+    if existing_feed:
+        raise ValueError(f"Feed already exists: {existing_feed.title}")
     
     # Get or create category
     category = None
@@ -35,8 +58,11 @@ async def add_feed(session: AsyncSession, url: str, category_name: str = None) -
     # Add initial entries
     for entry in parsed.entries[:10]:  # Limit to 10 most recent entries
         published = None
-        if hasattr(entry, "published_parsed"):
-            published = datetime(*entry.published_parsed[:6])
+        if hasattr(entry, "published_parsed") and entry.published_parsed:
+            try:
+                published = datetime(*entry.published_parsed[:6])
+            except:
+                pass
         
         db_entry = Entry(
             feed=feed,
