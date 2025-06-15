@@ -17,5 +17,10 @@ ARG ADMIN_PASSWORD=admin
 # Make sure the admin script is executable
 RUN chmod +x create_admin.py
 
+# Set environment variables and expose port
+ENV PORT=8181
+ENV HOST=0.0.0.0
+EXPOSE 8181
+
 # Command to run at container startup
 CMD python create_admin.py ${ADMIN_USER} ${ADMIN_EMAIL} ${ADMIN_PASSWORD} || echo "Admin already exists" && python main.py

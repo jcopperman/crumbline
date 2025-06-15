@@ -12,21 +12,20 @@ services:
       - SECRET_KEY=changethissecretkey
       - DATABASE_URL=sqlite+aiosqlite:///feeds.db
       - HOST=0.0.0.0
-      - PORT=8000
+      - PORT=8181
       - DEBUG=False
     ports:
-      - "8000:8000"
+      - "8181:8181"
     volumes:
       - ./feeds.db:/app/feeds.db
     restart: always
+    networks:
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.crumbline.rule=Host(`rss.outeniquastudios.com`)"
+      - "traefik.http.services.crumbline.loadbalancer.server.port=8181"
 
-  nginx:
-    image: nginx:alpine
-    ports:
-      - "80:80"
-    volumes:
-      - ./nginx_crumbline.conf:/etc/nginx/conf.d/default.conf
-      - ./static:/app/static
-    depends_on:
-      - crumbline
-    restart: always
+networks:
+  web:
+    external: true
