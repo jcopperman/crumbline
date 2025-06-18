@@ -7,20 +7,38 @@ from .models import Feed, Entry, Category
 async def add_feed(session: AsyncSession, url: str, category_name: str = None) -> Feed:
     # Parse feed to get initial data
     try:
+        print(f"Attempting to parse feed: {url}")
         parsed = feedparser.parse(url)
+        
+        # Print detailed debug info for this specific feed
+        if "sexandloveletters.com" in url:
+            print(f"Detailed feed info for {url}:")
+            print(f"Feed keys: {parsed.feed.keys() if hasattr(parsed, 'feed') else 'No feed attribute'}")
+            if hasattr(parsed, 'entries') and len(parsed.entries) > 0:
+                print(f"First entry keys: {parsed.entries[0].keys()}")
+                print(f"First entry: {parsed.entries[0]}")
+        
+        # Check for bozo exception (invalid feed format)
         if parsed.bozo and hasattr(parsed, 'bozo_exception'):
+            print(f"Bozo exception: {type(parsed.bozo_exception).__name__}: {parsed.bozo_exception}")
             raise ValueError(f"Invalid RSS feed: {parsed.bozo_exception}")
         elif parsed.bozo:
+            print("Feed marked as bozo but no exception")
             raise ValueError("Invalid RSS feed format")
         
         # Check if feed has entries
         if not hasattr(parsed, 'entries') or len(parsed.entries) == 0:
+            print("Feed contains no entries")
             raise ValueError("Feed contains no entries")
             
         # Check if feed has a title
         if not hasattr(parsed.feed, 'title'):
+            print("Feed has no title")
             raise ValueError("Feed has no title")
+            
     except Exception as e:
+        print(f"Exception type: {type(e).__name__}")
+        print(f"Exception message: {str(e)}")
         if isinstance(e, ValueError):
             raise
         raise ValueError(f"Error fetching feed: {str(e)}")
@@ -64,10 +82,11 @@ async def add_feed(session: AsyncSession, url: str, category_name: str = None) -
             except:
                 pass
         
+        # Use get() method for all attributes to avoid AttributeError
         db_entry = Entry(
             feed=feed,
-            title=entry.title,
-            link=entry.link,
+            title=entry.get('title', 'Untitled'),
+            link=entry.get('link', '#'),
             published=published,
             content=entry.get("description", "")
         )
@@ -77,40 +96,48 @@ async def add_feed(session: AsyncSession, url: str, category_name: str = None) -
     return feed
 
 async def update_feed(session: AsyncSession, feed: Feed) -> None:
-    parsed = feedparser.parse(feed.url)
-    if parsed.bozo:
-        return
-    
-    # Update feed metadata
-    feed.title = parsed.feed.get("title", feed.title)
-    feed.description = parsed.feed.get("description", feed.description)
-    feed.last_updated = datetime.utcnow()
-    
-    # Get existing entry links
-    existing_links = await session.execute(
-        select(Entry.link).where(Entry.feed_id == feed.id)
-    )
-    existing_links = {link[0] for link in existing_links}
-    
-    # Add new entries
-    for entry in parsed.entries:
-        if entry.link in existing_links:
-            continue
-            
-        published = None
-        if hasattr(entry, "published_parsed"):
-            published = datetime(*entry.published_parsed[:6])
+    try:
+        parsed = feedparser.parse(feed.url)
+        if parsed.bozo and hasattr(parsed, 'bozo_exception'):
+            print(f"Warning: Feed {feed.url} has bozo exception: {parsed.bozo_exception}")
+            return
         
-        db_entry = Entry(
-            feed=feed,
-            title=entry.title,
-            link=entry.link,
-            published=published,
-            content=entry.get("description", "")
+        # Update feed metadata
+        feed.title = parsed.feed.get("title", feed.title)
+        feed.description = parsed.feed.get("description", feed.description)
+        feed.last_updated = datetime.utcnow()
+        
+        # Get existing entry links
+        existing_links = await session.execute(
+            select(Entry.link).where(Entry.feed_id == feed.id)
         )
-        session.add(db_entry)
-    
-    await session.commit()
+        existing_links = {link[0] for link in existing_links}
+        
+        # Add new entries
+        for entry in parsed.entries:
+            if entry.link in existing_links:
+                continue
+                
+            published = None
+            if hasattr(entry, "published_parsed") and entry.published_parsed:
+                try:
+                    published = datetime(*entry.published_parsed[:6])
+                except (TypeError, ValueError) as e:
+                    print(f"Warning: Could not parse date in feed {feed.url}: {e}")
+            
+            db_entry = Entry(
+                feed=feed,
+                title=entry.get('title', 'Untitled'),
+                link=entry.get('link', '#'),
+                published=published,
+                content=entry.get("description", "")
+            )
+            session.add(db_entry)
+        
+        await session.commit()
+    except Exception as e:
+        print(f"Error updating feed {feed.url}: {str(e)}")
+        # Don't let feed update errors crash the application
 
 async def get_feeds(session: AsyncSession):
     result = await session.execute(
