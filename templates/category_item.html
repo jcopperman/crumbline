@@ -1,0 +1,21 @@
+<div class="category-section" id="category-{{ category.id }}">
+    <div class="flex items-center justify-between mb-2">
+        <button hx-get="/categories/{{ category.id }}/entries"
+                hx-target="#entries-container"
+                class="flex-1 text-left p-2 bg-crumb-accent-dark/20 border border-crumb-accent-dark/30 rounded text-crumb-text hover:bg-crumb-accent-orange/20 transition-colors font-medium">
+            📁 {{ category.name }} ({{ category.feeds|length }})
+        </button>
+        <button hx-delete="/categories/{{ category.id }}"
+                hx-target="#category-{{ category.id }}"
+                hx-swap="outerHTML swap:1s"
+                hx-confirm="Delete category '{{ category.name }}'? Feeds will be uncategorized."
+                class="ml-2 text-crumb-muted hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
+            ×
+        </button>
+    </div>
+    <div class="ml-4 space-y-1">
+        {% for feed in category.feeds %}
+            {% include "feed_item.html" %}
+        {% endfor %}
+    </div>
+</div>

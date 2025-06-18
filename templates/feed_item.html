@@ -1,13 +1,19 @@
 <div class="group flex items-center justify-between p-2 hover:bg-crumb-accent-orange/10 hover:scale-[1.02] rounded transition-all duration-200" id="feed-{{ feed.id }}">
     <button hx-get="/feeds/{{ feed.id }}/entries"
             hx-target="#entries-container"
-            class="flex-1 text-left text-crumb-text hover:text-crumb-accent-orange transition-colors">
+            class="flex-1 text-left text-crumb-text hover:text-crumb-accent-orange transition-colors text-sm">
         {{ feed.title }}
+        {% if feed.category %}
+            <span class="text-crumb-muted text-xs block">{{ feed.category.name }}</span>
+        {% endif %}
     </button>
-    <button hx-delete="/feeds/{{ feed.id }}"
-            hx-target="#feed-{{ feed.id }}"
-            hx-swap="outerHTML swap:1s"
-            class="text-crumb-muted hover:text-crumb-accent-orange opacity-0 group-hover:opacity-100 transition-all">
-        ×
-    </button>
-</div> 
+    <div class="flex items-center opacity-0 group-hover:opacity-100 transition-all">
+        <button hx-delete="/feeds/{{ feed.id }}"
+                hx-target="#feed-{{ feed.id }}"
+                hx-swap="outerHTML swap:1s"
+                hx-confirm="Delete feed '{{ feed.title }}'?"
+                class="text-crumb-muted hover:text-red-400 transition-colors ml-1">
+            ×
+        </button>
+    </div>
+</div>

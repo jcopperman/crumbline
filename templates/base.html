@@ -12,10 +12,11 @@
     <link rel="manifest" href="/static/images/site.webmanifest">
     <meta name="theme-color" content="#FF9052">
     <script src="https://unpkg.com/htmx.org@1.9.10"></script>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="/static/output.css" rel="stylesheet">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500&family=Playfair+Display:wght@400;500&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
         tailwind.config = {
             theme: {
@@ -54,9 +55,20 @@
         <div class="bg-crumb-accent-dark/20 border-b border-crumb-accent-dark/30 py-2 px-4 flex justify-between items-center">
             <div class="flex items-center">
                 <img src="/static/images/logo.svg" alt="Crumbline Logo" class="h-8 w-auto mr-2">
+                <h1 class="font-serif text-xl text-crumb-text">Crumbline</h1>
             </div>
-            <div>
-                <span class="mr-4">Hello, {{ current_user.username }}</span>
+            <div class="flex items-center space-x-4">
+                <a href="/unread" hx-get="/unread" hx-target="#entries-container" hx-push-url="true" class="text-crumb-text hover:text-crumb-accent-orange transition-colors">
+                    <span class="relative">
+                        📰
+                        {% if unread_count > 0 %}
+                        <span class="absolute -top-2 -right-2 bg-crumb-accent-orange text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+                            {{ unread_count }}
+                        </span>
+                        {% endif %}
+                    </span>
+                </a>
+                <span class="text-crumb-muted">Hello, {{ current_user.username }}</span>
                 <a href="/logout" class="text-crumb-accent-orange hover:underline">Logout</a>
             </div>
         </div>

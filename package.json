@@ -1,0 +1,6 @@
+{
+  "devDependencies": {
+    "eslint": "^9.29.0",
+    "tailwindcss": "^4.1.10"
+  }
+}

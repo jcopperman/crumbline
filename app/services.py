@@ -135,4 +135,102 @@ async def toggle_entry_read(session: AsyncSession, entry_id: int) -> bool:
         entry.is_read = not entry.is_read
         await session.commit()
         return entry.is_read
-    return False 
+    return False
+
+# Category management functions
+async def get_categories(session: AsyncSession):
+    """Get all categories with their feed counts"""
+    result = await session.execute(
+        select(Category).order_by(Category.name)
+    )
+    return result.scalars().all()
+
+async def get_categories_with_feeds(session: AsyncSession):
+    """Get categories organized with their feeds"""
+    from sqlalchemy.orm import selectinload
+    result = await session.execute(
+        select(Category)
+        .options(selectinload(Category.feeds))
+        .order_by(Category.name)
+    )
+    categories = result.scalars().all()
+
+    # Also get uncategorized feeds
+    uncategorized_result = await session.execute(
+        select(Feed).where(Feed.category_id.is_(None)).order_by(Feed.title)
+    )
+    uncategorized_feeds = uncategorized_result.scalars().all()
+
+    return categories, uncategorized_feeds
+
+async def create_category(session: AsyncSession, name: str) -> Category:
+    """Create a new category"""
+    # Check if category already exists
+    existing = await session.execute(
+        select(Category).where(Category.name == name)
+    )
+    existing_category = existing.scalar_one_or_none()
+    if existing_category:
+        raise ValueError(f"Category '{name}' already exists")
+
+    category = Category(name=name)
+    session.add(category)
+    await session.commit()
+    return category
+
+async def update_category(session: AsyncSession, category_id: int, name: str) -> Category:
+    """Update category name"""
+    category = await session.get(Category, category_id)
+    if not category:
+        raise ValueError("Category not found")
+
+    # Check if new name already exists (excluding current category)
+    existing = await session.execute(
+        select(Category).where(Category.name == name, Category.id != category_id)
+    )
+    if existing.scalar_one_or_none():
+        raise ValueError(f"Category '{name}' already exists")
+
+    category.name = name
+    await session.commit()
+    return category
+
+async def delete_category(session: AsyncSession, category_id: int) -> bool:
+    """Delete a category and uncategorize its feeds"""
+    category = await session.get(Category, category_id)
+    if not category:
+        return False
+
+    # Uncategorize all feeds in this category
+    feeds_result = await session.execute(
+        select(Feed).where(Feed.category_id == category_id)
+    )
+    feeds = feeds_result.scalars().all()
+    for feed in feeds:
+        feed.category_id = None
+
+    await session.delete(category)
+    await session.commit()
+    return True
+
+async def move_feed_to_category(session: AsyncSession, feed_id: int, category_id: int = None) -> Feed:
+    """Move a feed to a different category (or uncategorize it)"""
+    feed = await session.get(Feed, feed_id)
+    if not feed:
+        raise ValueError("Feed not found")
+
+    if category_id is not None:
+        category = await session.get(Category, category_id)
+        if not category:
+            raise ValueError("Category not found")
+
+    feed.category_id = category_id
+    await session.commit()
+    return feed
+
+async def get_unread_count(session: AsyncSession) -> int:
+    """Get the total count of unread entries"""
+    result = await session.execute(
+        select(Entry).where(Entry.is_read == False)
+    )
+    return len(result.scalars().all())

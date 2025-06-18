@@ -5,11 +5,6 @@
     <!-- Sidebar -->
     <div class="w-72 bg-crumb-bg border-r border-crumb-accent-dark/20 sticky top-0 h-screen overflow-y-auto">
         <div class="p-8">
-            <div class="flex items-center mb-8 group cursor-pointer">
-                <img src="/static/images/logo.svg" alt="Crumbline Logo" class="h-10 w-auto mr-3 group-hover:rotate-12 transition-transform duration-300">
-                <h1 class="font-serif text-2xl text-crumb-text group-hover:text-crumb-accent-orange transition-colors">Crumbline</h1>
-            </div>
-            
             <!-- Navigation -->
             <div class="mb-8">
                 <a href="/" class="block p-3 mb-2 bg-crumb-accent-orange/80 border border-crumb-accent-orange/20 rounded text-crumb-text hover:bg-crumb-accent-orange transition-colors">
@@ -22,9 +17,9 @@
             
             <!-- Add Feed Form -->
             <div id="feed-form-container">
-                <form hx-post="/feeds" 
-                      hx-target="#feed-form-container"
-                      hx-swap="outerHTML"
+                <form hx-post="/feeds"
+                      hx-target="#feed-list"
+                      hx-swap="innerHTML"
                       class="mb-8">
                     {% if error %}
                     <div id="feed-error-message" class="mb-4 p-3 bg-red-900/30 border border-red-800 text-red-200 rounded">
@@ -33,8 +28,13 @@
                     {% endif %}
                     <input type="url" name="url" placeholder="Feed URL" required
                         class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-3 text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange">
-                    <input type="text" name="category" placeholder="Category (optional)"
-                        class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-3 text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange">
+                    <select name="category"
+                        class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-3 text-crumb-text focus:outline-none focus:border-crumb-accent-orange">
+                        <option value="">Select category (optional)</option>
+                        {% for category in categories %}
+                            <option value="{{ category.name }}">{{ category.name }}</option>
+                        {% endfor %}
+                    </select>
                     <button type="submit" 
                         class="w-full p-3 bg-crumb-accent-orange/80 text-crumb-text rounded hover:bg-crumb-accent-orange transition-colors">
                         Add Feed
@@ -42,11 +42,68 @@
                 </form>
             </div>
 
-            <!-- Feed List -->
-            <div id="feed-list" class="space-y-2">
-                {% for feed in feeds %}
-                    {% include "feed_item.html" %}
+            <!-- Category and Feed List -->
+            <div id="feed-list" class="space-y-4">
+                <!-- All Entries Button -->
+                <button hx-get="/"
+                        hx-target="#entries-container"
+                        class="w-full p-3 bg-crumb-accent-orange/20 border border-crumb-accent-orange/40 rounded text-crumb-text hover:bg-crumb-accent-orange/30 transition-colors">
+                    📰 All Entries
+                </button>
+
+                <!-- Categories with Feeds -->
+                {% for category in categories %}
+                    <div class="category-section">
+                        <div class="flex items-center justify-between mb-2">
+                            <button hx-get="/categories/{{ category.id }}/entries"
+                                    hx-target="#entries-container"
+                                    class="flex-1 text-left p-2 bg-crumb-accent-dark/20 border border-crumb-accent-dark/30 rounded text-crumb-text hover:bg-crumb-accent-orange/20 transition-colors font-medium">
+                                📁 {{ category.name }} ({{ category.feeds|length }})
+                            </button>
+                            <button hx-delete="/categories/{{ category.id }}"
+                                    hx-target="closest .category-section"
+                                    hx-swap="outerHTML swap:1s"
+                                    hx-confirm="Delete category '{{ category.name }}'? Feeds will be uncategorized."
+                                    class="ml-2 text-crumb-muted hover:text-red-400 opacity-0 group-hover:opacity-100 transition-all">
+                                ×
+                            </button>
+                        </div>
+                        <div class="ml-4 space-y-1">
+                            {% for feed in category.feeds %}
+                                {% include "feed_item.html" %}
+                            {% endfor %}
+                        </div>
+                    </div>
                 {% endfor %}
+
+                <!-- Uncategorized Feeds -->
+                {% if uncategorized_feeds %}
+                    <div class="category-section">
+                        <div class="p-2 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded text-crumb-text font-medium mb-2">
+                            📂 Uncategorized ({{ uncategorized_feeds|length }})
+                        </div>
+                        <div class="ml-4 space-y-1">
+                            {% for feed in uncategorized_feeds %}
+                                {% include "feed_item.html" %}
+                            {% endfor %}
+                        </div>
+                    </div>
+                {% endif %}
+
+                <!-- Add Category Form -->
+                <div id="category-form-container" class="mt-6">
+                    <form hx-post="/categories"
+                          hx-target="#feed-list"
+                          hx-swap="innerHTML"
+                          class="mb-4">
+                        <input type="text" name="name" placeholder="New category name" required
+                            class="w-full p-2 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-2 text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange text-sm">
+                        <button type="submit"
+                            class="w-full p-2 bg-crumb-accent-orange/60 text-crumb-text rounded hover:bg-crumb-accent-orange/80 transition-colors text-sm">
+                            Add Category
+                        </button>
+                    </form>
+                </div>
             </div>
         </div>
     </div>

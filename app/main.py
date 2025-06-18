@@ -11,7 +11,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from .database import get_session, init_db
 from . import services
-from .models import Feed, Entry, User
+from .models import Feed, Entry, User, Category
 from .auth import (
     authenticate_user, create_access_token, get_password_hash,
     get_current_user_from_cookie, login_required
@@ -179,11 +179,31 @@ async def home(
     if not current_user:
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     
-    feeds = await services.get_feeds(session)
+    categories, uncategorized_feeds = await services.get_categories_with_feeds(session)
     entries = await services.get_entries(session)
+    unread_count = await services.get_unread_count(session)
+
+    if request.headers.get("HX-Request") == "true":
+        return templates.TemplateResponse(
+            "feed_entries.html",
+            {
+                "request": request,
+                "entries": entries,
+                "current_user": current_user,
+                "unread_count": unread_count
+            }
+        )
+
     return templates.TemplateResponse(
         "index.html",
-        {"request": request, "feeds": feeds, "entries": entries, "current_user": current_user}
+        {
+            "request": request,
+            "categories": categories,
+            "uncategorized_feeds": uncategorized_feeds,
+            "entries": entries,
+            "current_user": current_user,
+            "unread_count": unread_count
+        }
     )
 
 @app.post("/feeds", response_class=HTMLResponse)
@@ -200,16 +220,19 @@ async def add_feed(
     
     try:
         feed = await services.add_feed(session, url, category)
+        # Return updated feed list to refresh the sidebar
+        categories, uncategorized_feeds = await services.get_categories_with_feeds(session)
         return templates.TemplateResponse(
-            "feed_item.html",
-            {"request": request, "feed": feed, "current_user": current_user}
+            "feed_list.html",
+            {"request": request, "categories": categories, "uncategorized_feeds": uncategorized_feeds, "current_user": current_user}
         )
     except ValueError as e:
         # For HTMX requests, return the form with error message
         error_message = str(e)
+        categories = await services.get_categories(session)
         return templates.TemplateResponse(
-            "feed_form_error.html",
-            {"request": request, "error": error_message, "url": url, "category": category},
+            "feed_form_with_error.html",
+            {"request": request, "error": error_message, "url": url, "category": category, "categories": categories},
             status_code=status.HTTP_400_BAD_REQUEST
         )
 
@@ -225,9 +248,15 @@ async def get_feed_entries(
         return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
     
     entries = await services.get_entries(session, feed_id=feed_id)
+    unread_count = await services.get_unread_count(session)
     return templates.TemplateResponse(
         "feed_entries.html",
-        {"request": request, "entries": entries, "current_user": current_user}
+        {
+            "request": request,
+            "entries": entries,
+            "current_user": current_user,
+            "unread_count": unread_count
+        }
     )
 
 @app.post("/entries/{entry_id}/toggle", response_class=HTMLResponse)
@@ -271,3 +300,149 @@ async def delete_feed(
     await session.delete(feed)
     await session.commit()
     return ""
+
+# Category endpoints
+@app.get("/categories/{category_id}/entries", response_class=HTMLResponse)
+async def get_category_entries(
+    request: Request,
+    category_id: int,
+    session: AsyncSession = Depends(get_session)
+):
+    # Check if user is logged in
+    current_user = await get_current_user_from_cookie(request, session)
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+
+    entries = await services.get_entries(session, category_id=category_id)
+    category = await session.get(Category, category_id)
+    unread_count = await services.get_unread_count(session)
+    return templates.TemplateResponse(
+        "category_entries.html",
+        {
+            "request": request,
+            "entries": entries,
+            "category": category,
+            "current_user": current_user,
+            "unread_count": unread_count
+        }
+    )
+
+@app.post("/categories", response_class=HTMLResponse)
+async def create_category(
+    request: Request,
+    name: str = Form(...),
+    session: AsyncSession = Depends(get_session)
+):
+    # Check if user is logged in
+    current_user = await get_current_user_from_cookie(request, session)
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+
+    try:
+        category = await services.create_category(session, name)
+        # Return updated feed list to refresh the sidebar
+        categories, uncategorized_feeds = await services.get_categories_with_feeds(session)
+        return templates.TemplateResponse(
+            "feed_list.html",
+            {"request": request, "categories": categories, "uncategorized_feeds": uncategorized_feeds, "current_user": current_user}
+        )
+    except ValueError as e:
+        categories, uncategorized_feeds = await services.get_categories_with_feeds(session)
+        return templates.TemplateResponse(
+            "feed_list_with_category_error.html",
+            {"request": request, "error": str(e), "name": name, "categories": categories, "uncategorized_feeds": uncategorized_feeds, "current_user": current_user},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+@app.put("/categories/{category_id}", response_class=HTMLResponse)
+async def update_category(
+    request: Request,
+    category_id: int,
+    name: str = Form(...),
+    session: AsyncSession = Depends(get_session)
+):
+    # Check if user is logged in
+    current_user = await get_current_user_from_cookie(request, session)
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+
+    try:
+        category = await services.update_category(session, category_id, name)
+        return templates.TemplateResponse(
+            "category_item.html",
+            {"request": request, "category": category, "current_user": current_user}
+        )
+    except ValueError as e:
+        return templates.TemplateResponse(
+            "category_edit_error.html",
+            {"request": request, "error": str(e), "category_id": category_id, "name": name},
+            status_code=status.HTTP_400_BAD_REQUEST
+        )
+
+@app.delete("/categories/{category_id}", response_class=HTMLResponse)
+async def delete_category(
+    request: Request,
+    category_id: int,
+    session: AsyncSession = Depends(get_session)
+):
+    # Check if user is logged in
+    current_user = await get_current_user_from_cookie(request, session)
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+
+    success = await services.delete_category(session, category_id)
+    if not success:
+        raise HTTPException(status_code=404, detail="Category not found")
+
+    return ""
+
+@app.put("/feeds/{feed_id}/category", response_class=HTMLResponse)
+async def move_feed_to_category(
+    request: Request,
+    feed_id: int,
+    category_id: int = Form(None),
+    session: AsyncSession = Depends(get_session)
+):
+    # Check if user is logged in
+    current_user = await get_current_user_from_cookie(request, session)
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+
+    try:
+        feed = await services.move_feed_to_category(session, feed_id, category_id)
+        return templates.TemplateResponse(
+            "feed_item.html",
+            {"request": request, "feed": feed, "current_user": current_user}
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@app.get("/unread", response_class=HTMLResponse)
+async def unread_entries(
+    request: Request,
+    session: AsyncSession = Depends(get_session)
+):
+    current_user = await get_current_user_from_cookie(request, session)
+    if not current_user:
+        return RedirectResponse(url="/login", status_code=status.HTTP_303_SEE_OTHER)
+    entries_result = await session.execute(
+        select(Entry).where(Entry.is_read == False).order_by(Entry.published.desc())
+    )
+    entries = entries_result.scalars().all()
+    unread_count = await services.get_unread_count(session)
+    if request.headers.get("HX-Request") == "true":
+        return templates.TemplateResponse(
+            "feed_entries.html",
+            {"request": request, "entries": entries, "current_user": current_user, "unread_count": unread_count}
+        )
+    return templates.TemplateResponse(
+        "index.html",
+        {
+            "request": request,
+            "categories": [],
+            "uncategorized_feeds": [],
+            "entries": entries,
+            "current_user": current_user,
+            "unread_count": unread_count
+        }
+    )

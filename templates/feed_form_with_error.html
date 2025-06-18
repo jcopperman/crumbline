@@ -1,5 +1,5 @@
 <div id="feed-form-container">
-    <form hx-post="/feeds"
+    <form hx-post="/feeds" 
           hx-target="#feed-list"
           hx-swap="innerHTML"
           class="mb-8">
@@ -8,7 +8,7 @@
         </div>
         <input type="url" name="url" placeholder="Feed URL" required value="{{ url }}"
             class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-3 text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange">
-        <select name="category"
+        <select name="category" 
             class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-3 text-crumb-text focus:outline-none focus:border-crumb-accent-orange">
             <option value="">Select category (optional)</option>
             {% for cat in categories %}

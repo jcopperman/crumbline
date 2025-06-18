@@ -1,0 +1,9 @@
+{% for entry in entries %}
+    {% include "feed_entry.html" %}
+{% endfor %}
+{% if not entries %}
+    <div class="text-center text-crumb-muted py-12">
+        <p class="text-xl mb-2">📂</p>
+        <p>No entries in {{ category.name }} category yet.</p>
+    </div>
+{% endif %}

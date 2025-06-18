@@ -1,0 +1,16 @@
+<div id="category-form-container" class="mt-6">
+    <form hx-post="/categories" 
+          hx-target="#category-form-container"
+          hx-swap="outerHTML"
+          class="mb-4">
+        <div class="mb-2 p-2 bg-red-900/30 border border-red-800 text-red-200 rounded text-sm">
+            {{ error }}
+        </div>
+        <input type="text" name="name" placeholder="New category name" required value="{{ name }}"
+            class="w-full p-2 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-2 text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange text-sm">
+        <button type="submit" 
+            class="w-full p-2 bg-crumb-accent-orange/60 text-crumb-text rounded hover:bg-crumb-accent-orange/80 transition-colors text-sm">
+            Add Category
+        </button>
+    </form>
+</div>
