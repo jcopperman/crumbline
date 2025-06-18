@@ -10,9 +10,9 @@
             class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-3 text-crumb-text placeholder-crumb-muted focus:outline-none focus:border-crumb-accent-orange">
         <select name="category" 
             class="w-full p-3 bg-crumb-accent-dark/10 border border-crumb-accent-dark/20 rounded mb-3 text-crumb-text focus:outline-none focus:border-crumb-accent-orange">
-            <option value="">Select category (optional)</option>
+            <option value="" style="background-color: #0f0f0f; color: #e5e5e5;">Select category (optional)</option>
             {% for cat in categories %}
-                <option value="{{ cat.name }}" {% if category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
+                <option value="{{ cat.name }}" {% if category == cat.name %}selected{% endif %} style="background-color: #0f0f0f; color: #e5e5e5;">{{ cat.name }}</option>
             {% endfor %}
         </select>
         <button type="submit" 
