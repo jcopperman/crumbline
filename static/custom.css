@@ -1,0 +1,7 @@
+/* Custom styles for dropdown menus */
+@layer utilities {
+  select option {
+    background-color: #0f0f0f !important; /* crumb-bg color */
+    color: #e5e5e5 !important; /* crumb-text color */
+  }
+}
